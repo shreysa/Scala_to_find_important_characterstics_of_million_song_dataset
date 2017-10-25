@@ -29,14 +29,9 @@ object SimpleApp {
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local")
     val sc = new SparkContext(conf)
 
-    val sqlContext = new SQLContext(sc)
-    val df = sqlContext.read
-      .format("com.databricks.spark.csv")
-      .option("header", "true")        // Use first line of all files as header
-      .option("delimiter", ";")        // Use ';' as delimiter
-      .option("inferSchema", "true")   // Automatically infer data types
-      .option("mode", "DROPMALFORMED") // DROPS lines that are malformed. Other options PERMISSIVE | FAILFAST
-      .load("./data/song_info.csv")
+    val cleanLines = lines.flatMap { line => line.split(',') }
+      .filter { !_.isEmpty }
+    lines.map()
 
     df.printSchema()
 
@@ -51,5 +46,29 @@ object SimpleApp {
     val numBs = logData.filter(line => line.contains("b")).count()
     log.info(s"Lines with a: $numAs, Lines with b: $numBs")
     println("Lines with a: %s, Lines with b: %s".format(numAs, numBs))
+  }
+
+  def filter(): Unit ={
+
+  }
+
+  def getUnique(): Unit = {
+    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/song_info.csv")
+    val headerAndRows = lines.map(line => line.split(";").map(_.trim))
+    val header = headerAndRows.first
+    val data = headerAndRows.filter(_(0) != header(0))
+    //val maps = data.map(splits => header.zip(splits).toMap)
+    //val dataArray = data.map { _(0).split(";") }
+    dataArray.map { _(16) }.distinct.count
+    dataArray.map { _(0) }.distinct.count
+    dataArray.map { _() }.distinct.count
+  }
+
+  def loudness(): Unit = {
+    val top5 = data.map { _(6).toDouble }
+      .collect
+      .toList
+      .sortWith(_ > _)
+      .take(5)
   }
 }
