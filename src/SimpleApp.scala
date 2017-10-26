@@ -6,9 +6,9 @@
  * @author Shreysa Sharma
  */
 
-import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.log4j.{LogManager, Level, PropertyConfigurator}
+import org.apache.spark.rdd;
 
 object SimpleApp {
   def main(args: Array[String]) {
@@ -35,15 +35,15 @@ object SimpleApp {
     */
 
 
-
     val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/song_info.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data = headerAndRows.filter(_(0) != header(0))
-    getUnique(data);
-    getSong(data)
-
-
+    getUnique(data)
+    getTopSong(data)
+    getTopArtist(data)
+    getTopKey(data)
+    getTopWords(data)
 
 
 
@@ -63,7 +63,7 @@ object SimpleApp {
     println(uniq_artist, uniq_alb, uniq_song)
   }
 
-  def getSong( x : rdd.RDD[Array[String]] ): Unit = {
+  def getTopSong( x : rdd.RDD[Array[String]] ): Unit = {
     var x1 = checkValidity("3", x)
     var x2 = checkValidity("2", x1)
     //val songs = x2.map { _(23) }
@@ -88,71 +88,79 @@ object SimpleApp {
     val hotns = x2.map { _(25) }
     val top5hot = songtuple.zip(hotns).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
 
+    //Print any of the above vals.
   }
 
-  def getArtist( x : rdd.RDD[Array[String]] ): Unit = {
+  def getTopArtist( x : rdd.RDD[Array[String]] ): Unit = {
     var x1 = checkValidity("3", x)
+    var x2 = checkValidity("8", x1)
 
+    var x3 = checkValidity("1", x2)
+    val artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
+    val fam = x3.map { _(19) }
+    val top5famArt = artistuple.zip(fam).map { x => x._1, x._2.toDouble }.collect.toList.sortWith(_._2>_._2).take(5)
+
+    var x3 = checkValidity("9", x2)
+    val artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
+    val artHot = x3.map { _(20) }
+    val top5famArt = artistuple.zip(artHot).map { x => x._1, x._2.toDouble }.collect.toList.sortWith(_._2>_._2).take(5)
+
+    //Doesn't yet check for the uniqueness of artists. So, 4 of top 5 familiar artists may be the same.
+    //print the above vals
   }
 
-  def getFam(): Unit ={
-
-    val artist = data.map { _(16) }
-    val artistnm = data.map { _(17) }
-
-    val artistuple = artistnm zip artist
-
-    artistuple.zip(fam).map { x => x._1, x._2.toDouble }.collect.toList.sortWith(_._2>_._2).take(5)
-
-    val fam = data.map { _(19) }
-
-    var dataFam = data.filter(x => !(x(19).equalsIgnoreCase("na"))).filter(x => x(19).toDouble > 0).
-
-
-      checkValidity()
+  def getTopKey( x : rdd.RDD[Array[String]] ): Unit ={
+    var x1 = checkValidity("6", x)
+    var x2 = checkValidity("7", x1)
+    val top5key = x2.map{ _(8) }.countByValue.toSeq.sortWith(_._2 > _._2).take(5)
+    //print
   }
 
 
+  def getTopWords( x : rdd.RDD[Array[String]]): Unit ={
+    var x1 = checkValidity("10", x)
+    val top5Words = x1.map{_(24)}.flatMap { line => line.filter(c => c.isLetter || c.isWhitespace).toUpperCase.split(' ') }.filter { !_.isEmpty }.countByValue.toSeq.sortWith(_._2 > _._2).take(5)
+    //Taken from konrad's wordCount. Doesn't yet have the filter for articles etc.
+    //print
+  }
 
+  /*incomplete, don't call*/
+  def getTopGenre( x : rdd.RDD[Array[String]]): Unit ={
+    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/artist_terms.csv")
+    val headerAndRows = lines.map(line => line.split(";").map(_.trim))
+    val header = headerAndRows.first
+    val data = headerAndRows.filter(_(0) != header(0))
+
+    data.map(line => line(1).zip(line(0)).toMap)
+
+
+    data1.map(line => (line(1), line(0))).filter(line => !(line._1.equals(""))).map(_._1).countByValue.toSeq.sortWith(_._2 > _._2)
+  }
 
   def checkValidity( a : String , data : rdd.RDD[Array[String]] ): rdd.RDD[Array[String]] = {
     a match {
       case "1" => data.filter (x => ! (x(19).equalsIgnoreCase ("na")) )
-                    .filter (x => x(19).toDouble > 0)           //Familiarity
+                    .filter (x => x(19).toDouble > 0)                     //Familiarity
       case "2" => data.filter (x => !(x(19).equalsIgnoreCase ("na")) )
-                    .filter{_(6).toDouble < 0}                  //Loudness
-      case "3" => data.filter (x => ! (x(0).isEmpty) )          //Track_id
+                    .filter{_(6).toDouble < 0}                              //Loudness
+      case "3" => data.filter (x => ! (x(0).isEmpty) )                      //Track_id
       case "4" => data.filter (x => x(5).toDouble > 0)                       //duration
       case "5" => data.filter (x => ! (x(7).equalsIgnoreCase ("na") ) )
-                    .filter (x => x(9).toDouble > 0)             //tempo
-        /**
-      case "6" => var key = data.map {_ (8).toInt}
-                    .collect
-                    .filter (x => (x >= 0) && (x <= 11) )
+                    .filter (x => x(9).toDouble > 0)                         //tempo
 
-      case "7" => var keyConf = data.map {_ (9).toDouble}
-                    .collect
-                    .filter (x => ! (x.equalsIgnoreCase ("na") ) )
-                    .map (x => Try (x.toDouble).getOrElse (0.0) )
-                    .filter (x => x > 0)
+      case "6" => data.filter (x => (x(8).toInt >= 0) && (x(8).toInt <= 11) )       //key
 
-          */
-      case "8" => var artistId = data.map {_ (16)}              //artist_id
-                    .collect
-                    .filter (x => ! (x.isEmpty) )
+      case "7" => data.filter (x => ! (x(9).equalsIgnoreCase ("na") ) )         //key_conf
+                    .filter (x => x(9).toDouble > 0.7)
 
-      case "9" => var artHot = data.map {_ (20)}                  //artist_name
-                    .collect
-                    .filter (x => ! (x.equalsIgnoreCase ("na") ) )
-                    .map (x => Try (x.toDouble).getOrElse (0.0) )
-                    .filter (x => x > 0)
-      /**
-      case "10" => var title = data.map {_ (24)}
-                    .collect
-                    .filter (x => ! (x.isEmpty) )
-        */
-      case "11" =>  data.filter (x => ! (x(25).equalsIgnoreCase ("na") ) )
-                      .filter (x => x(25).toDouble >= 0)                                 //hotness
+      case "8" => data.filter (x => ! (x(16).isEmpty))                                    //artist_id
+
+      case "9" => data.filter (x => ! (x(20).equalsIgnoreCase ("na")))
+                    .filter (x => (x(20).toDouble >= 0) && (x(20).toDouble <= 1))                //artist_hotness
+
+      case "10" => data.filter (x => ! (x(24).isEmpty) )                    //title
+      case "11" => data.filter (x => ! (x(25).equalsIgnoreCase ("na") ) )
+                      .filter (x => (x(25).toDouble >= 0) && (x(25).toDouble <= 1))                //song_hotness
         /**
       case "12" => var year = data.map {_ (26)}
                     .collect
