@@ -8,4 +8,4 @@ metastore_db
 derby.log
 *.csv
 build.sbt
-
+.DS_Store

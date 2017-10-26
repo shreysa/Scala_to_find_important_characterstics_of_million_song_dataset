@@ -1,0 +1,65 @@
+---
+title: "Report"
+author: "Shreysa Sharma, Jashangeet Singh"
+date: "10/25/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Code Repository: https://github.ccs.neu.edu/pdpmr-f17/a6-jashangeet-shreysa.git
+
+#### Specifications of host execution Environment
+Attribute                         | Value
+----------------------------------|-------------------------------
+Java Version                      | 1.8.0_102
+Java(TM) SE Runtime Environment   | (build 1.8.0_102-b14)
+Java HotSpot(TM) 64-Bit Server VM | (build 25.102-b14, mixed mode)
+Model Identifier                  |	MacBookPro11,2
+Processor Name                    |	Intel Core i7
+Processor Speed                   |	2.2 GHz
+Number of Processors              |	1
+Total Number of Cores             |	4
+L2 Cache (per Core)               |	256 KB
+L3 Cache                          |	6 MB
+Memory                            | 16 GB
+
+### Summary of the design of evaluated program
+
+The implementation involves reading the data and putting it in SparkContext. 
+
+#### Analysis
+
+```{r}
+library(ggplot2)
+spark_run_local<-read.csv("output/spark_run.csv")
+knitr::kable(spark_run_local)
+```
+
+The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about  minutes to finish. These values are for the subset on the assignment page on the local machine.
+
+```{r}
+library(ggplot2)
+spark_run_local_big<-read.csv("output/spark_run_big.csv")
+knitr::kable(spark_run_local_big)
+```
+
+The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about  minutes to finish. These values are for the full dataset on the local machine.
+
+```{r}
+library(ggplot2)
+spark_run_emr<-read.csv("output/spark_run_emr.csv")
+knitr::kable(spark_run_emr)
+```
+
+The above table represents the total time taken by Scala job in seconds. These values are for the subset on the assignment page on EMR.
+
+```{r}
+library(ggplot2)
+spark_run_big_emr<-read.csv("output/spark_run_big_emr.csv")
+knitr::kable(spark_run_big_emr)
+```
+
+The above table represents the total time taken by Scala job in seconds. These values are for the full dataset on EMR.
