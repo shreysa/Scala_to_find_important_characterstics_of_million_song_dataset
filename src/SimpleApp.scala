@@ -8,7 +8,7 @@
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.log4j.{LogManager, Level, PropertyConfigurator}
-import org.apache.spark.rdd;
+import org.apache.spark.rdd
 import java.util.Calendar
 
 object SimpleApp {
@@ -102,8 +102,11 @@ object SimpleApp {
     var x1 = checkValidity("3", x)
     var x2 = checkValidity("8", x1)
 
+    var artistuple = x2.map{ _(16) } zip x2.map{ _(17) }
+    val top5Art = artistuple.mapValues(x => (x,1)).reduceByKey((x, y) => (x._1, x._2 + y._2)).collect.toList.sortWith(_._2._2>_._2._2).take(5)
+
     var x3 = checkValidity("1", x2)
-    var artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
+    artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
     val fam = x3.map { _(19) }
     val top5famArt = artistuple.zip(fam).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).distinct.take(5)
     println("The top 5 familiar artists are: " + top5famArt)
@@ -131,21 +134,28 @@ object SimpleApp {
     //Taken from konrad's wordCount. Doesn't yet have the filter for articles etc.
     //print
      val endTime = Calendar.getInstance().getTime().getMinutes - startTime
- println("Total Time taken: " + endTime)
+    println("Total Time taken: " + endTime)
   }
 
-  /* incomplete, don't call
-  def getTopGenre( x : rdd.RDD[Array[String]]): Unit ={
-    val lines = sc.textFile(""./data/MillionSongSubset/artist_terms.csv")
+
+  /*incomplete, don't call*/
+  def getTopGenre( x : rdd.RDD[Array[String]], sc : SparkContext): Unit ={
+    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/artist_terms.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
-    val data = headerAndRows.filter(_(0) != header(0))
+    val data1 = headerAndRows.filter(_(0) != header(0))
 
-    data.map(line => line(1).zip(line(0)).toMap)
+    //x1 = checkValidity("", x)
+    //x2 = checkValidity("", data1)
 
+    val artist_term = data1.map(lines => (lines(1), lines(0)))
+    val artist_hotness = x.map(lines => ((lines(16), lines(17)), lines(20)))
+    //val artist_dist_hot = artist_hotness.distinct.map(lines => lines)
+    val art_coll = artist_hotness.distinct.map(lines => lines).collect
+    val top5Genres = artist_term.map(lines => (lines._1, art_coll.filter(_._1._1 == lines._2)(0)._2)).mapValues(x => (x.toDouble, 1)).reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2)).mapValues(y => 1.0 * y._1 / y._2).collect.toList.sortWith(_._2>_._2).take(5)
 
-    data1.map(line => (line(1), line(0))).filter(line => !(line._1.equals(""))).map(_._1).countByValue.toSeq.sortWith(_._2 > _._2)
-  } */
+  }
+
 
   def checkValidity( a : String , data : rdd.RDD[Array[String]] ): rdd.RDD[Array[String]] = {
     a match {
@@ -180,5 +190,4 @@ object SimpleApp {
         */
     }
   }
-
 }
