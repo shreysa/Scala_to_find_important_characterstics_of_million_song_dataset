@@ -35,11 +35,6 @@ object SimpleApp {
 
     df.printSchema()
 
-    val selectedData = df.select("artist_id", "artist_name")
-    selectedData.write
-      .format("com.databricks.spark.csv")
-      .option("header", "true")
-      .save("./data/output")
 
     val logData = sc.textFile(logFile, 2).cache()
     val numAs = logData.filter(line => line.contains("a")).count()
@@ -126,8 +121,5 @@ object SimpleApp {
     .map(x => Try(x.toInt).getOrElse(0)) 
     .filter(x => x > 0)
 
-
   }
-
-  def
 }
