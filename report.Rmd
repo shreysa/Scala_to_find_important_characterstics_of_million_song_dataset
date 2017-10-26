@@ -30,7 +30,7 @@ Memory                            | 16 GB
 
 The implementation involves reading the data and putting it in SparkContext. 
 
-#### Analysis
+#### performance Analysis
 
 ```{r}
 library(ggplot2)
@@ -63,3 +63,28 @@ knitr::kable(spark_run_big_emr)
 ```
 
 The above table represents the total time taken by Scala job in seconds. These values are for the full dataset on EMR.
+
+
+## Data Analysis
+
+####Assumptions
+
+for loudness of song, the closer the loudness score to 0 in negative, the louder the song. If value is 0, then it is an invalid entry
+for longness of song, the duration should be greater than 0, the larger the value, longer is the song
+for fastness of song, the larger the value of tempo, the faster is the song
+for artist familiarity, song hottness, artist hottness, the higher the value from 0, the more familiarity score. If value is 0, record is invalid
+
+For the bigger dataset 
+number of distinct songs: 
+number of distinct artists:
+number of distinct albums:
+top 5 loudest songs:
+top 5 longest songs:
+top 5 fastest songs:
+top 5 most familiar artists:
+top 5 hottest songs:
+top 5 hottest artists:
+top 5 hottest genres (mean artists hotness in artist_term):
+top 5 most popular keys (must have confidence > 0.7):
+top 5 most prolific artists (include ex-equo items, if any):
+top 5 most common words in song titles (excluding articles, prepositions, conjunctions):
