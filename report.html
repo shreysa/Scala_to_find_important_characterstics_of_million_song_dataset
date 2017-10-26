@@ -185,8 +185,8 @@ $(document).ready(function () {
 <div id="summary-of-the-design-of-evaluated-program" class="section level3">
 <h3>Summary of the design of evaluated program</h3>
 <p>The implementation involves reading the data and putting it in SparkContext.</p>
-<div id="analysis" class="section level4">
-<h4>Analysis</h4>
+<div id="performance-analysis" class="section level4">
+<h4>performance Analysis</h4>
 <table>
 <thead>
 <tr class="header">
@@ -341,6 +341,29 @@ $(document).ready(function () {
 </tbody>
 </table>
 <p>The above table represents the total time taken by Scala job in seconds. These values are for the full dataset on EMR.</p>
+</div>
+</div>
+<div id="data-analysis" class="section level2">
+<h2>Data Analysis</h2>
+<div id="assumptions" class="section level4">
+<h4>Assumptions</h4>
+<p>for loudness of song, the closer the loudness score to 0 in negative, the louder the song. If value is 0, then it is an invalid entry</p>
+<p>for longness of song, the duration should be greater than 0, the larger the value, longer is the song</p>
+<p>for fastness of song, the larger the value of tempo, the faster is the song</p>
+<p>for artist familiarity, song hottness, artist hottness, the higher the value from 0, the more familiarity score, song hottness and artist hottness respectively. If value is 0, record is invalid</p>
+<p>For the bigger dataset number of distinct songs:</p>
+<p>number of distinct artists:</p>
+<p>number of distinct albums:</p>
+<p>top 5 loudest songs:</p>
+<p>top 5 longest songs:</p>
+<p>top 5 fastest songs:</p>
+<p>top 5 most familiar artists:</p>
+<p>top 5 hottest songs:</p>
+<p>top 5 hottest artists:</p>
+<p>top 5 hottest genres (mean artists hotness in artist_term):</p>
+<p>top 5 most popular keys (must have confidence &gt; 0.7):</p>
+<p>top 5 most prolific artists (include ex-equo items, if any):</p>
+<p>top 5 most common words in song titles (excluding articles, prepositions, conjunctions):</p>
 </div>
 </div>
 
