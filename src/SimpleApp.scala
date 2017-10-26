@@ -59,16 +59,75 @@ object SimpleApp {
     val data = headerAndRows.filter(_(0) != header(0))
     //val maps = data.map(splits => header.zip(splits).toMap)
     //val dataArray = data.map { _(0).split(";") }
+
     dataArray.map { _(16) }.distinct.count
     dataArray.map { _(0) }.distinct.count
     dataArray.map { _() }.distinct.count
   }
 
-  def loudness(): Unit = {
-    val top5 = data.map { _(6).toDouble }
-      .collect
-      .toList
-      .sortWith(_ > _)
-      .take(5)
+  def CheckValidity(): Unit = {
+    var loud = data.map{_(6).toDouble} 
+    .filter(x => x < 0) 
+    .collect 
+
+    var trackId = data.map{_(0)} 
+    .collect 
+    .filter(x => !(x.isEmpty)) 
+
+    var duration = data.map{_(5).toDouble} 
+    .collect 
+    .filter(x => x > 0) 
+
+    var tempo = data.map{_(7).toDouble} 
+    .collect
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toDouble).getOrElse(0.0)) 
+    .filter(x => x > 0)
+
+    var key = data.map{_(8).toInt} 
+    .collect 
+    .filter(x => (x >= 0) && (x <= 11))
+
+    var keyConf = data.map{_(9).toDouble} 
+    .collect 
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toDouble).getOrElse(0.0)) 
+    .filter(x => x > 0)
+
+    var artistId = data.map{_(16)} 
+    .collect 
+    .filter(x => !(x.isEmpty))
+
+    var artFam = data.map{_(19)}
+    .collect
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toDouble).getOrElse(0.0)) 
+    .filter(x => x > 0)
+
+    var artHot = data.map{_(20)}
+    .collect
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toDouble).getOrElse(0.0)) 
+    .filter(x => x > 0)
+
+    var title = data.map{_(24)} 
+    .collect 
+    .filter(x => !(x.isEmpty))
+
+    var songHot = data.map{_(25)} 
+    .collect 
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toDouble).getOrElse(0.0)) 
+    .filter(x => x > 0)
+
+    var year = data.map{_(26)}
+    .collect 
+    .filter(x => !(x.equalsIgnoreCase("na"))) 
+    .map(x => Try(x.toInt).getOrElse(0)) 
+    .filter(x => x > 0)
+
+
   }
+
+  def
 }
