@@ -9,8 +9,11 @@
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.log4j.{LogManager, Level, PropertyConfigurator}
 import org.apache.spark.rdd;
+import java.util.Calendar
 
 object SimpleApp {
+
+  var startTime = Calendar.getInstance().getTime().getMinutes
   def main(args: Array[String]) {
     
     // Set-up logging
@@ -24,7 +27,6 @@ object SimpleApp {
     val log = LogManager.getLogger("SimpleApp")
     log.setLevel(Level.INFO)
     log.info("Starting...")
-
     val logFile = "./data/input.txt"
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local")
     val sc = new SparkContext(conf)
@@ -35,7 +37,8 @@ object SimpleApp {
     */
 
 
-    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/song_info.csv")
+    val lines = sc.textFile("./data/CompleteDataset/song_info.csv")
+   // val lines = sc.textFile("./data/MillionSongSubset/song_info.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data = headerAndRows.filter(_(0) != header(0))
@@ -45,9 +48,6 @@ object SimpleApp {
     getTopKey(data)
     getTopWords(data)
 
-
-
-    df.printSchema()
     val logData = sc.textFile(logFile, 2).cache()
     val numAs = logData.filter(line => line.contains("a")).count()
     val numBs = logData.filter(line => line.contains("b")).count()
@@ -60,7 +60,10 @@ object SimpleApp {
     val uniq_artist = x.map { _(16) }.distinct.count
     val uniq_song = x.map { _(23) }.distinct.count
     val uniq_alb = x.map { _(22) }.distinct.count
-    println(uniq_artist, uniq_alb, uniq_song)
+    println("Count of distinct artists "  + uniq_artist)
+    println("Count of distinct albums "  + uniq_alb)
+    println("Count of distinct songs "  + uniq_song)
+  
   }
 
   def getTopSong( x : rdd.RDD[Array[String]] ): Unit = {
@@ -68,26 +71,30 @@ object SimpleApp {
     var x2 = checkValidity("2", x1)
     //val songs = x2.map { _(23) }
     //val songnm = x2.map { _(24) }
-    var songtuple = x2.map { _(23) } zip x2.map { _(24) }             //(song_id, sond_name) tuple
+    var songtuple = x2.map { _(23) } zip x2.map { _(24) }             //(song_id, song_name) tuple
     val loud = x2.map { _(6) }
     val top5loud = songtuple.zip(loud).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
 
+    println("The top 5 loud songs are: " + top5loud)
+
 
     x2 = checkValidity("4", x1)
-    songtuple = x2.map { _(23) } zip x2.map { _(24) }                 //(song_id, sond_name) tuple
+    songtuple = x2.map { _(23) } zip x2.map { _(24) }                 //(song_id, song_name) tuple
     val long1 = x2.map { _(5) }
     val top5long = songtuple.zip(long1).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
+    println("The top 5 long songs are: " + top5long)
 
     x2 = checkValidity("5", x1)
-    songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, sond_name) tuple
+    songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, song_name) tuple
     val tempo = x2.map { _(7) }
     val top5fast = songtuple.zip(tempo).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
+    println("The top 5 fast songs are: " + top5fast)
 
     x2 = checkValidity("11", x1)
-    songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, sond_name) tuple
+    songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, song_name) tuple
     val hotns = x2.map { _(25) }
     val top5hot = songtuple.zip(hotns).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
-
+    println("The top 5 hot songs are: " + top5hot)
     //Print any of the above vals.
   }
 
@@ -96,14 +103,15 @@ object SimpleApp {
     var x2 = checkValidity("8", x1)
 
     var x3 = checkValidity("1", x2)
-    val artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
+    var artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
     val fam = x3.map { _(19) }
-    val top5famArt = artistuple.zip(fam).map { x => x._1, x._2.toDouble }.collect.toList.sortWith(_._2>_._2).take(5)
+    val top5famArt = artistuple.zip(fam).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).distinct.take(5)
+    println("The top 5 familiar artists are: " + top5famArt)
 
-    var x3 = checkValidity("9", x2)
-    val artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
+    x3 = checkValidity("9", x2)
+    artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
     val artHot = x3.map { _(20) }
-    val top5famArt = artistuple.zip(artHot).map { x => x._1, x._2.toDouble }.collect.toList.sortWith(_._2>_._2).take(5)
+    val top5famArtHot = artistuple.zip(artHot).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).distinct.take(5)
 
     //Doesn't yet check for the uniqueness of artists. So, 4 of top 5 familiar artists may be the same.
     //print the above vals
@@ -122,11 +130,13 @@ object SimpleApp {
     val top5Words = x1.map{_(24)}.flatMap { line => line.filter(c => c.isLetter || c.isWhitespace).toUpperCase.split(' ') }.filter { !_.isEmpty }.countByValue.toSeq.sortWith(_._2 > _._2).take(5)
     //Taken from konrad's wordCount. Doesn't yet have the filter for articles etc.
     //print
+     val endTime = Calendar.getInstance().getTime().getMinutes - startTime
+ println("Total Time taken: " + endTime)
   }
 
-  /*incomplete, don't call*/
+  /* incomplete, don't call
   def getTopGenre( x : rdd.RDD[Array[String]]): Unit ={
-    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/artist_terms.csv")
+    val lines = sc.textFile(""./data/MillionSongSubset/artist_terms.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data = headerAndRows.filter(_(0) != header(0))
@@ -135,7 +145,7 @@ object SimpleApp {
 
 
     data1.map(line => (line(1), line(0))).filter(line => !(line._1.equals(""))).map(_._1).countByValue.toSeq.sortWith(_._2 > _._2)
-  }
+  } */
 
   def checkValidity( a : String , data : rdd.RDD[Array[String]] ): rdd.RDD[Array[String]] = {
     a match {

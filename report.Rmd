@@ -75,7 +75,9 @@ for longness of song, the duration should be greater than 0, the larger the valu
 
 for fastness of song, the larger the value of tempo, the faster is the song
 
-for artist familiarity, song hottness, artist hottness, the higher the value from 0, the more familiarity score, song hottness and artist hottness respectively. If value is 0, record is invalid
+for artist familiarity, the higher the value from 0, the more is the score. If value is 0 or less than 0, record is invalid
+
+for song hottness, artist hottness, the values should be between 0 and 1. Any value less than 0 or greater than 1 is invalid
 
 For the bigger dataset 
 number of distinct songs: 
