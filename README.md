@@ -5,8 +5,11 @@
 ## Running 
 - Clone the repository
 - Update `SCALA_HOME` and `SPARK_HOME` in the `Makefile`
+- create a folder data and place the input files
+- Update variable INPUT_SONGS_FILE_PATH=the path of song_info.csv in your system
+- Update variable INPUT_ARTIST_TERMS_FILE_PATH= the path of artist_terms.csv in your system
 - Verify `SPARK_CLASS_PATH` (For some installations the lib path is `libexec/jars/*`)
-- `make` or `make all` or `make clean && make build && make run && make report`
+- `make` this will clean, build, run the program and generate the report
 
 ## Requirements
 - Scala - used version `2.11.11`. *NOTE* using `2.12.4` results in error (`java.lang.NoClassDefFoundError: scala/runtime/LambdaDeserialize`)
