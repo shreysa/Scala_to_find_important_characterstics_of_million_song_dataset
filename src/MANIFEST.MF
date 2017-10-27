@@ -1,1 +1,1 @@
-Main-Class: SimpleApp
+Main-Class: SongApp

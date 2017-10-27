@@ -2,7 +2,8 @@
 title: "Report"
 author: "Shreysa Sharma, Jashangeet Singh"
 date: "10/25/2017"
-output: html_document
+output: 
+ pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -28,9 +29,11 @@ Memory                            | 16 GB
 
 ### Summary of the design of evaluated program
 
-The implementation involves reading the data and putting it in SparkContext. 
+The implementation involves reading the data and putting it in SparkContext. Cleaning the data by putting various validity checks and then using maps, filters and other functions availabe in scala to get the desired output.
 
-#### performance Analysis
+### Performance Analysis
+
+#### Table 1: Time taken for 10 runs on small dataset
 
 ```{r}
 library(ggplot2)
@@ -38,7 +41,22 @@ spark_run_local<-read.csv("output/spark_run.csv")
 knitr::kable(spark_run_local)
 ```
 
-The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about  minutes to finish. These values are for the subset on the assignment page on the local machine.
+The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about 5.9 seconds to finish. These values are for the subset on the assignment page on the local machine.
+
+##### Plot 1: Total time in seconds vs Run for the subset
+
+```{r}
+ggplot(spark_run_local, aes(x=Run, y=total_time, color="Total Time")) + 
+  geom_point() +
+  ylab("Total Time in seconds") + 
+  xlab("Run") + 
+  scale_y_continuous(breaks=seq(4,9,1), limits = c(4, 9)) +
+  scale_x_continuous(breaks=seq(1,10,1), limits = c(1,10))
+```
+
+Plot 1 represents the graph for the data shown in table 1. This represnts the total time taken by each run in seconds on the small dataset. It can be seen from the graph that the values range between 5 to 7 seconds averaging out to 5.9 seconds for 10 runs.
+
+#### Table 2: Time taken for 10 runs on complete dataset
 
 ```{r}
 library(ggplot2)
@@ -46,7 +64,21 @@ spark_run_local_big<-read.csv("output/spark_run_big.csv")
 knitr::kable(spark_run_local_big)
 ```
 
-The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about  minutes to finish. These values are for the full dataset on the local machine.
+Table 2 represents the total time taken and total average time of 10 runs of Scala job in seconds for the complete dataset. Each run takes about 100.6 seconds to finish.
+
+##### Plot 2: Total time in seconds vs Run for the big dataset
+
+```{r}
+ggplot(spark_run_local_big, aes(x=Run, y=total_time, color="Total Time")) + 
+  geom_point() +
+  ylab("Total Time in seconds") + 
+  xlab("Run") + 
+  scale_y_continuous(breaks=seq(90,110,5), limits = c(90, 110)) +
+  scale_x_continuous(breaks=seq(1,10,1), limits = c(1,10))
+```
+
+Plot 2 represents the graph for the data shown in table 2. This represnts the total time taken by each run in seconds on the complete dataset. It can be seen from the graph that the values range between 98 to 102 seconds averaging out to 100.6 seconds for 10 runs.
+
 
 ```{r}
 library(ggplot2)
@@ -69,39 +101,124 @@ The above table represents the total time taken by Scala job in seconds. These v
 
 ####Assumptions
 
-for loudness of song, the closer the loudness score to 0 in negative, the louder the song. If value is 0, then it is an invalid entry
+For loudness of song, the closer the loudness score to 0 in negative, the louder the song. If value is 0, then it is an invalid entry. We have taken the Song Id, Song Name and Loudness score combination to represent the loudness score. This combination is unique. So if there is a song with same id and same name but different loudness score or any of the other combinations it would appear as a distinct entry in the list.
 
-for longness of song, the duration should be greater than 0, the larger the value, longer is the song
+For longness of song, the duration should be greater than 0, the larger the value, longer is the song. We have taken the Song Id, Song Name and duration combination to represent the longest songs. This combination is unique.
 
-for fastness of song, the larger the value of tempo, the faster is the song
+For fastness of song, the larger the value of tempo, the faster is the song. We have taken the Song Id, Song Name and tempo score combination to represent the how fast the song is. This combination is unique. 
 
-for artist familiarity, the higher the value from 0, the more is the score. If value is 0 or less than 0, record is invalid
 
-for song hottness, artist hottness, the values should be between 0 and 1. Any value less than 0 or greater than 1 is invalid
+For artist familiarity, the higher the value from 0, the more is the score. If value is 0 or less than 0, record is invalid
+We have taken artist name, artist id and artist familiarity score combination to represent the artist familiarity. This combination is unique. So if there is an artist with same id but different name and different familiarity score or any of the other combinations it would appear as a distinct entry in the list.
 
-For the bigger dataset 
-number of distinct songs: 
+For song hottness and artist hottness the values should be between 0 and 1. Any value less than 0 or greater than 1 is invalid.
+We have taken song id or artist id, song name or artist name and song hotness or artist hotness score combination to represent the song hotness and artist hotness respectively. This combination is unique. So if there is an artist or a song with same id but different name or different hotness score or any of the other combinations it would appear as a distinct entry in the list.
 
-number of distinct artists:
+For the bigger dataset :
 
-number of distinct albums:
+#### Number of distinct songs: 999056
 
-top 5 loudest songs:
+#### Number of distinct artists: 44745
 
-top 5 longest songs:
+#### Number of distinct albums: 149275
 
-top 5 fastest songs:
+#### Top 5 loudest songs: 
+(Assumption: the Song Id, Song Name and Loudness Score combination is unique)
 
-top 5 most familiar artists:
+Song Id                         | Song Name                       | Loudness Score
+--------------------------------|---------------------------------|------------------------------------
+SOAKZAH12AB0187EA3              | The Spectre's Sinister Commandment) | -0.003
+SOSKGCK12AC90715B1              | A Body So Warm                      | -0.009
+SOBNOEN12AB018AE49              | Mechanoid 002                       |-0.01
+SOLPFVW12A8C137059              | Penvag                              |-0.021
+SOMGDNA12AC3DF6A17              | Face the Nation                     |-0.025
 
-top 5 hottest songs:
+#### Top 5 longest songs:
+(Assumption: the Song Id, Song Name and duration combination is unique)
 
-top 5 hottest artists:
+Song Id                         | Song Name                       | Duration
+--------------------------------|---------------------------------|------------------------------------
+SOOUBST12AC90977B6              | Grounation) | 3034.90567
+SOXUCQN12A6D4FC451              | Raag - Shuddha KalyaN                      | 3033.5995
+SOOMVZJ12AB01878EB              | Discussion 2                      |3033.44281
+SOTNVEE12A8C13F470              | Chapitre Un (a): Toutes Les Histoires                              |3032.76363
+SOGFXNB12A8C137BE5              | Der Geist des Llano Estacado  Ein Spion                     |3032.58077
 
-top 5 hottest genres (mean artists hotness in artist_term):
+#### Top 5 fastest songs:
+(Assumption: the Song Id, Song Name and Tempo Score combination is unique)
 
-top 5 most popular keys (must have confidence > 0.7):
+Song Id                         | Song Name                       | Tempo Score
+--------------------------------|---------------------------------|------------------------------------
+SOVVTEZ12AB0184AAB              | Beep Beep | 302.3
+SOMSJWX12AB017DB99              | Late Nite Lounge: WVIP                      | 296.469
+SOUTBKH12A8C136286              | A Place Called Hope                       |285.157
+SOEVQJB12AC960DA2C              | Bellas Lullaby - Perrier Citron                              |284.208
+SOTUXOB12AB0188C3A              | Troubled Times                     |282.573
 
-top 5 most prolific artists (include ex-equo items, if any):
+
+#### Top 5 most familiar artists:
+(Assumption: the Artist Name, Artist Id and Familiarity Score combination is unique)
+
+Artist Name                        | Artist Id                      | Familiarity Score
+-----------------------------------|--------------------------------|------------------------------------
+Akon                                | ARCGJ6U1187FB4D01F            | 1.0
+Akon_ San Quinn_ JT the Bigga Figga | ARCGJ6U1187FB4D01F            | 1.0
+Akon / Eminem                       | ARCGJ6U1187FB4D01F            |1.0
+Akon / Styles P                     | ARCGJ6U1187FB4D01F            |1.0
+Akon / Wyclef Jean                  | ARCGJ6U1187FB4D01F            |1.0
+
+#### Top 5 Hot artists:
+(Assumption: the Artist Name, Artist Id and Hotness Score combination is unique)
+
+Artist Name                        | Artist Id                      | Hotness Score
+-----------------------------------|--------------------------------|------------------------------------
+Daft Punk                          | ARF8HTQ1187B9AE693       | 0.997066533839045
+Daft Punk                        | ARF8HTQ1187B9AE693            |0.997004803235357
+Black Eyed Peas                   | ARTDQRC1187FB4EFD4     | 0.982623202516712
+Kanye West                    | ARRH63Y1187FB47783            |0.972399563931911
+Kanye West / Jamie Foxx                  | ARRH63Y1187FB47783            |0.972399563931911
+
+
+##### Top 5 hottest songs:
+(Assumption: the Song Id, Song Name and Hotness Score combination is unique)
+
+Song Id                        | Song Name                      | Hotness Score
+-----------------------------------|--------------------------------|------------------------------------
+SOXQYSC12A6310E908                         | Bitter Sweet Symphony       | 1.0
+SOHGFPP12A8AE4624D                        | White Flag            |1.0
+SONQEYS12AF72AABC9                   | Mr. Jones     | 1.0
+SOULTKQ12AB018A183                    | Nothin' On You [feat. Bruno Mars]            |1.0
+SOAAXAK12A8C13C030                  | Immigrant Song            |1.0
+
+
+
+##### Top 5 Prolific artists:
+(Assumption: the Artist Id, Artist Name and Hotness Score combination is unique)
+
+Artist Id                        | Artist Name                      | Hotness Score
+-----------------------------------|--------------------------------|------------------------------------
+AR6681Y1187FB39B02                         | Ike & Tina Turner       | 208
+ARXPPEY1187FB51DF4                        | Michael Jackson            |204
+ARH861H1187B9B799E                   | Johnny Cash     | 201
+AR8L6W21187B9AD317                    | Diana Ross & The Supremes            | 196
+ARLHO5Z1187FB4C861                  | Beastie Boys            | 194
+
+
+
+#### Top 5 hottest genres (mean artists hotness in artist_term):
+
+
+
+#### Top 5 most popular keys (must have confidence > 0.7):
+
+Key                        | Key Confidence                     
+-----------------------------------|------------------------------
+7                         | 30420       
+0                        | 28333          
+2                   | 25845     
+9                    | 21283
+4                  | 15214       
 
 top 5 most common words in song titles (excluding articles, prepositions, conjunctions):
+
+

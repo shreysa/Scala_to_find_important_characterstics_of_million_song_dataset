@@ -35,6 +35,7 @@ build: init $(SOURCES:.scala=.class)
 
 report:
 	@echo "Generating report..."
+	Rscript -e 'library(rmarkdown); rmarkdown::render("./report.Rmd", "html_document", "pdf_document")' 
 
 run:
 	@$(SPARK_SUBMIT) --master local[4] $(TARGET_FOLDER)/a6.jar
