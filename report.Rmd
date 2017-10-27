@@ -118,7 +118,6 @@ Kanye West / Jamie Foxx            | ARRH63Y1187FB47783             | 0.97239956
 ##### Top 5 hottest songs:
 (Assumption: the Song Id, Song Name and Hotness Score combination is unique)
 
- The top 5 hot songs are: List(((SONMVZB12AB01829BA,Der Maggot Tango),0.521321041187445), ((SOAGFNE12A8C134D82,Donde Caigo),0.454192988218022), ((SOIUPEW12A8C13BCB2,Willow Weep For Me (Live)),0.266955186275539), ((SOAYGMO12A6D4F69E8,I'd Have Never Found Somebody New),0.249065794853703), ((SOFJZNE12A8AE45C1F,The blind Walk Over The Edge),0.492398352817721))
 
 Song Id                        | Song Name                          | Hotness Score
 -------------------------------|------------------------------------|------------------------
