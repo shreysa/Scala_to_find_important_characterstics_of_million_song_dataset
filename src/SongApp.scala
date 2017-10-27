@@ -27,17 +27,18 @@ object SongApp {
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local")
     val sc = new SparkContext(conf)
 
-    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/spark-2.2.0-bin-hadoop2.7/a6/a61/all/song_info.csv")
+    //val lines = sc.textFile("/Users/jashanrandhawa/Downloads/spark-2.2.0-bin-hadoop2.7/a6/a61/all/song_info.csv")
     //val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/CompleteDataset/song_info.csv")
-   // val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/MillionSongSubset/song_info.csv")
+    val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/MillionSongSubset/song_info.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data = headerAndRows.filter(_(0) != header(0))
     getUnique(data)
     getTopSong(data)
     getTopArtist(data)
-    getTopKey(data)
-    getTopWords(data)
+    getTopKey(data, sc)
+    getTopWords(data, sc)
+    getTopGenre(data, sc)
   }
 
 
@@ -57,26 +58,26 @@ object SongApp {
    
     var songtuple = x2.map { _(23) } zip x2.map { _(24) }             //(song_id, song_name) tuple
     val loud = x2.map { _(6) }
-    val top5loud = songtuple.zip(loud).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
+    val top5loud = songtuple.zip(loud).map { x => (x._1, x._2.toDouble) }.sortBy(_._2, false).take(5).toList
 	println("The top 5 loud songs are: " + top5loud)
 
 
     x2 = checkValidity("4", x1)
     songtuple = x2.map { _(23) } zip x2.map { _(24) }                 //(song_id, song_name) tuple
     val long1 = x2.map { _(5) }
-    val top5long = songtuple.zip(long1).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
+    val top5long = songtuple.zip(long1).map { x => (x._1, x._2.toDouble) }.sortBy(_._2, false).take(5).toList
     println("The top 5 long songs are: " + top5long)
 
     x2 = checkValidity("5", x1)
     songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, song_name) tuple
     val tempo = x2.map { _(7) }
-    val top5fast = songtuple.zip(tempo).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).take(5)
+    val top5fast = songtuple.zip(tempo).map { x => (x._1, x._2.toDouble) }.sortBy(_._2, false).take(5).toList
     println("The top 5 fast songs are: " + top5fast)
 
     x2 = checkValidity("11", x1)
     songtuple = x2.map { _(23) } zip x2.map { _(24) }                  //(song_id, song_name) tuple
     val hotns = x2.map { _(25) }
-    val top5hot = songtuple.zip(hotns).map { x => (x._1, x._2.toDouble) }.collect.toList.sortWith(_._2>_._2).distinct.take(5)
+    val top5hot = songtuple.zip(hotns).map { x => (x._1, x._2.toDouble) }.sortBy(_._2, false).distinct.take(5).toList
     println("The top 5 hot songs are: " + top5hot)
     
   }
@@ -86,58 +87,60 @@ object SongApp {
     var x2 = checkValidity("8", x1)
 
     var artistuple = x2.map{ _(16) } zip x2.map{ _(17) }
-    val top5Art = artistuple.mapValues(x => (x,1)).reduceByKey((x, y) => (x._1, x._2 + y._2)).collect.toList.sortWith(_._2._2>_._2._2).take(5)
+    val top5Art = artistuple.mapValues(x => (x,1)).reduceByKey((x, y) => (x._1, x._2 + y._2)).sortBy(_._2._2, false).take(5).toList
     println("The top 5 prolific artists are: " + top5Art)
 
     var x3 = checkValidity("1", x2)
     artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
     val fam = x3.map { _(19) }
-    val top5famArt = artistuple.zip(fam).map { x => (x._1, x._2.toDouble) }.collect.toList.distinct.sortWith(_._2>_._2).take(5)
+    val top5famArt = artistuple.zip(fam).map { x => (x._1, x._2.toDouble) }.distinct.sortBy(_._2, false).take(5).toList
     println("The top 5 familiar artists are: " + top5famArt)
 
     x3 = checkValidity("9", x2)
     artistuple = x3.map { _(17) } zip x3.map { _(16) }                //(artist_name, artist_id) tuple
     val artHot = x3.map { _(20) }
-    val top5famArtHot = artistuple.zip(artHot).map { x => (x._1, x._2.toDouble) }.collect.toList.distinct.sortWith(_._2>_._2).take(6)
+    val top5famArtHot = artistuple.zip(artHot).map { x => (x._1, x._2.toDouble) }.distinct.sortBy(_._2, false).take(5).toList
     println("The top 5 hot artists are: " + top5famArtHot)
   }
 
-  def getTopKey( x : rdd.RDD[Array[String]] ): Unit ={
+  def getTopKey( x : rdd.RDD[Array[String]], sc : SparkContext ): Unit ={
     var x1 = checkValidity("6", x)
     var x2 = checkValidity("9", x1)
-    val top5key = x2.map{ _(8) }.countByValue.toSeq.sortWith(_._2 > _._2).take(5)
+    val top5key = sc.parallelize(x2.map{ _(8) }.countByValue.toSeq).sortBy(_._2, false).take(5).toList
     println("The top 5 keys are: " + top5key)
   }
 
 
-  def getTopWords( x : rdd.RDD[Array[String]]): Unit ={
+  def getTopWords( x : rdd.RDD[Array[String]], sc : SparkContext): Unit ={
     var x1 = checkValidity("10", x)
     val words = x1.map{_(24)}.flatMap { line => line.filter(c => c.isLetter || c.isWhitespace).toUpperCase.split(' ') }.filter { !_.isEmpty }
     val ignored = Set(
       "THAT", "WITH", "THE", "AND", "TO", "OF",
       "A", "IT", "SHE", "HE", "YOU", "IN", "I",
       "HER", "AT", "AS", "ON", "THIS", "FOR",
-      "BUT", "NOT", "OR", "ME", "MY", "LP", "VERSION", "IS", "ALBUM")
-    val top5words = sc.parallelize(words.filter { !ignored.contains(_) }.countByValue.toSeq).sortBy(_._2, false).take(5)
+      "BUT", "NOT", "OR", "ME", "MY", "LP", "VERSION", "IS", "ALBUM", "AN", "THE")
+    val top5words = sc.parallelize(words.filter { !ignored.contains(_) }.countByValue.toSeq).sortBy(_._2, false).take(5).toList
 
-    //print
+    println("the top 5 words are: " + top5words)
      val endTime = Calendar.getInstance().getTime().getMinutes - startTime
     println("Total Time taken: " + endTime)
   }
 
-
-  /*incomplete, don't call*/
   def getTopGenre( x : rdd.RDD[Array[String]], sc : SparkContext): Unit ={
-    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/spark-2.2.0-bin-hadoop2.7/a6/a61/all/artist_terms.csv")
+    val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/MillionSongSubset/artist_terms.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data1 = headerAndRows.filter(_(0) != header(0))
 
-    val artist_term = data1.map(lines => (lines(0), lines(1))).reduceByKey((x,y) => x+"_"+y)
+    val artist_term = data1.map(lines => (lines(1), lines(0)))
     val artist_hotness = x.map(lines => (lines(16), lines(20)))
     //val artist_dist_hot = artist_hotness.distinct.map(lines => lines)
     val art_coll = artist_hotness.distinct.collect
-    val top5Genres = artist_term.map(lines => (lines._1, art_coll.filter(_._1 == lines._2)(0)._2)).mapValues(x => (x.toDouble, 1)).reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2)).mapValues(y => 1.0 * y._1 / y._2).collect.toList.sortWith(_._2>_._2).take(5)
+    val top5Genres = artist_term.map(lines => (lines._1, art_coll.filter(_._1 == lines._2)(0)._2))
+    .mapValues(x => (x.toDouble, 1))
+    .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
+    .mapValues(y => 1.0 * y._1 / y._2).sortBy(_._2, false).take(5).toList
+    println("The top 5 genres are : " + top5Genres)
 
   }
 

@@ -195,7 +195,7 @@ SOAAXAK12A8C13C030                  | Immigrant Song            |1.0
 ##### Top 5 Prolific artists:
 (Assumption: the Artist Id, Artist Name and Hotness Score combination is unique)
 
-Artist Id                        | Artist Name                      | Hotness Score
+Artist Id                        | Artist Name                      | Number of songs by the artist
 -----------------------------------|--------------------------------|------------------------------------
 AR6681Y1187FB39B02                         | Ike & Tina Turner       | 208
 ARXPPEY1187FB51DF4                        | Michael Jackson            |204
@@ -211,7 +211,7 @@ ARLHO5Z1187FB4C861                  | Beastie Boys            | 194
 
 #### Top 5 most popular keys (must have confidence > 0.7):
 
-Key                        | Key Confidence                     
+Key                        | Ocurrances                    
 -----------------------------------|------------------------------
 7                         | 30420       
 0                        | 28333          
@@ -219,6 +219,6 @@ Key                        | Key Confidence
 9                    | 21283
 4                  | 15214       
 
-top 5 most common words in song titles (excluding articles, prepositions, conjunctions):
+#### Top 5 most common words in song titles (excluding articles, prepositions, conjunctions):
 
 
