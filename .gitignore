@@ -6,6 +6,7 @@ project
 spark-warehouse
 metastore_db
 derby.log
-*.csv
+data/
 build.sbt
 .DS_Store
+*.iml
