@@ -7,6 +7,8 @@
 # === Modify this to reflect local installation === #
 SCALA_HOME = $(HOME)/tools/scala-2.11.11
 SPARK_HOME = $(HOME)/tools/spark-2.2.0-bin-hadoop2.7
+INPUT_SONGS_FILE_PATH=./data/CompleteDataset/song_info.csv
+INPUT_ARTIST_TERMS_FILE_PATH=.data/MillionSongSubset/artist_terms.csv
 
 # === Verify this path === #
 SPARK_CLASS_PATH = "$(SPARK_HOME)/jars/*"
@@ -21,7 +23,6 @@ CLASSPATH = $(SPARK_CLASS_PATH):$(TARGET_FOLDER)/$(BINARY_NAME)
 
 SRC_FOLDER = src
 SOURCES = $(shell find src -name "*.scala" -type f)
-INPUT_FILE_PATH=./data/MillionSongSubset/song_info.csv
 
 default: all
 
@@ -41,7 +42,7 @@ report:
 	Rscript -e 'library(rmarkdown); rmarkdown::render("./report.Rmd", "html_document", "pdf_document")' 
 
 run:
-	@$(SPARK_SUBMIT) --master local[4] $(TARGET_FOLDER)/a6.jar $(INPUT_FILE_PATH)
+	@$(SPARK_SUBMIT) --master local[4] $(TARGET_FOLDER)/a6.jar $(INPUT_SONGS_FILE_PATH) $(INPUT_ARTIST_TERMS_FILE_PATH)
 
 classpath:
 	@echo "Classpath: \n" $(CLASSPATH)

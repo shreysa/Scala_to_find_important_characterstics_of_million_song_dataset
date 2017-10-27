@@ -54,7 +54,7 @@ class CleanUp(row : String) extends java.io.Serializable {
     def getArtHot()   : Double = artHot
     def getSongHot()  : Double = songHot
     def getArtId()    : String = line(16)
-    def getArtistName : String = line(17)
+    def getArtistName() : String = line(17)
     def getAlbum()    : String = line(22)
     def getSongId()   : String = line(23)
     def getTitle()    : String = line(24)
