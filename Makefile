@@ -8,7 +8,7 @@
 SCALA_HOME = $(HOME)/tools/scala-2.11.11
 SPARK_HOME = $(HOME)/tools/spark-2.2.0-bin-hadoop2.7
 INPUT_SONGS_FILE_PATH=./data/CompleteDataset/song_info.csv
-INPUT_ARTIST_TERMS_FILE_PATH=.data/MillionSongSubset/artist_terms.csv
+INPUT_ARTIST_TERMS_FILE_PATH=./data/CompleteDataset/artist_terms.csv
 
 # === Verify this path === #
 SPARK_CLASS_PATH = "$(SPARK_HOME)/jars/*"

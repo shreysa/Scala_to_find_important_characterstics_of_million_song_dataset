@@ -26,6 +26,8 @@ Total Number of Cores             |	4
 L2 Cache (per Core)               |	256 KB
 L3 Cache                          |	6 MB
 Memory                            | 16 GB
+Driver Memory                     | 2 GB
+Executor Memory                   | 2 GB
 
 ### Summary of the design of evaluated program
 
@@ -64,17 +66,16 @@ Song Id                         | Song Name                           | Loudness
 SOAKZAH12AB0187EA3              | The Spectre's Sinister Commandment) | -0.003
 SOCYUFX12AAF3B3952              | Yff_ Lou Pappans                    | -0.048
 SOBUICA12AB01810FC              | High Holidays                       |-0.073
-SOWAPWP12A58A76F49              | Burning Wire                              |-0.021
-SOMGDNA12AC3DF6A17              | Face the Nation                     |-0.025
+SOWAPWP12A58A76F49              | Burning Wire                        |-0.086
+SOLQHPP12AB0187EC7              | I Know What You Want                |-0.086
 
-
-List(((SOAKZAH12AB0187EA3,The Spectre's Sinister Commandment),-0.003), ((SOCYUFX12AAF3B3952,Yff_ Lou Pappans),-0.048), ((SOBUICA12AB01810FC,High Holidays),-0.073), ((SOWAPWP12A58A76F49,Burning Wire),-0.086), ((SOLQHPP12AB0187EC7,I Know What You Want),-0.086))
+The top 5 long songs are: List(((SOTRWAY12AB01890C0,Raga: Kaushi Kanada (Tabla: Kumar Bose)),3032.5024), ((SORUVZA12AB0188823,Mixshake),3007.73832), ((SOFKISV12A8C1425CD,El Camino Real),2999.50975), ((SOKXXXH12A6D4FA3D6,Passionately Loving God In A Lukewarm Church (Live from Passion07)),2997.10649), ((SONYUXE12A8C13FF28,The Garden Of Brokenness),2986.97098))
 #### Top 5 longest songs:
 (Assumption: the Song Id, Song Name and duration combination is unique)
 
 Song Id                         | Song Name                               | Duration
 --------------------------------|-----------------------------------------|--------------------
-SOOUBST12AC90977B6              | Grounation)                             | 3034.90567
+SOOUBST12AC90977B6              | Grounation                              | 3034.90567
 SOXUCQN12A6D4FC451              | Raag - Shuddha KalyaN                   | 3033.5995
 SOOMVZJ12AB01878EB              | Discussion 2                            | 3033.44281
 SOTNVEE12A8C13F470              | Chapitre Un (a): Toutes Les Histoires   | 3032.76363
@@ -118,14 +119,26 @@ Kanye West / Jamie Foxx            | ARRH63Y1187FB47783             | 0.97239956
 ##### Top 5 hottest songs:
 (Assumption: the Song Id, Song Name and Hotness Score combination is unique)
 
+ The top 5 hot songs are: List(((SONMVZB12AB01829BA,Der Maggot Tango),0.521321041187445), ((SOAGFNE12A8C134D82,Donde Caigo),0.454192988218022), ((SOIUPEW12A8C13BCB2,Willow Weep For Me (Live)),0.266955186275539), ((SOAYGMO12A6D4F69E8,I'd Have Never Found Somebody New),0.249065794853703), ((SOFJZNE12A8AE45C1F,The blind Walk Over The Edge),0.492398352817721))
+
 Song Id                        | Song Name                          | Hotness Score
 -------------------------------|------------------------------------|------------------------
-SOXQYSC12A6310E9               | Bitter Sweet Symphony              | 1.0
-SOHGFPP12A8AE4624D             | White Flag                         | 1.0
-SONQEYS12AF72AABC9             | Mr. Jones                          | 1.0
-SOULTKQ12AB018A183             | Nothin' On You [feat. Bruno Mars]  | 1.0
-SOAAXAK12A8C13C030             | Immigrant Song                     | 1.0
+SONMVZB12AB01829BA             | Der Maggot Tango                   | 0.521321041187445
+SOAGFNE12A8C134D82             | Donde Caigo                        | 0.454192988218022
+SOIUPEW12A8C13BCB2             | Willow Weep For Me (Live)          | 0.266955186275539
+SOAYGMO12A6D4F69E8             | I'd Have Never Found Somebody New  | 0.249065794853703
+SOFJZNE12A8AE45C1F             | The blind Walk Over The Edge       | 0.492398352817721
 
+
+#### Top 5 hottest genres (mean artists hotness in artist_term)
+
+Genres                                       | Mean Hotness                    
+---------------------------------------------|------------------------------
+christmas song                               | 0.6084021138630802       
+kotekote                                     | 0.602220551426267          
+girl rockers                                 | 0.5737886278082237     
+alternative latin                            | 0.573758864329941
+bamboozle 09                                 | 0.570567389210622 
 
 
 ##### Top 5 Prolific artists:
@@ -157,18 +170,7 @@ LOVE                        | 28666
 LIVE                        | 17297          
 NO                          | 15461     
 YOUR                        | 14206
-DE                          | 13586 
-
-#### Top 5 hottest genres (mean artists hotness in artist_term)
-
-Genres                                       | Mean Hotness                    
----------------------------------------------|------------------------------
-merseybeat                                   | 0.840462688027116       
-piano rock                                   | 0.6257724090398099          
-breakbeat hardcore                           | 0.601436482837353     
-fearless records                             | 0.585867596137709
-maine                                        | 0.585867596137709   
-
+DE                       | 13586 
 
 ### Performance Analysis
 
@@ -180,7 +182,7 @@ spark_run_local<-read.csv("output/spark_run.csv")
 knitr::kable(spark_run_local)
 ```
 
-The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about 5.9 seconds to finish. These values are for the subset on the assignment page on the local machine.
+The above table represents the total time taken and total average time of 10 runs of Scala job in seconds. Each run takes about 8.6 seconds to finish. These values are for the subset on the assignment page on the local machine.
 
 ##### Plot 1: Total time in seconds vs Run for the subset
 
@@ -189,7 +191,7 @@ ggplot(spark_run_local, aes(x=Run, y=total_time, color="Total Time")) +
   geom_point() +
   ylab("Total Time in seconds") + 
   xlab("Run") + 
-  scale_y_continuous(breaks=seq(4,9,1), limits = c(4, 9)) +
+  scale_y_continuous(breaks=seq(7,11,1), limits = c(7, 11)) +
   scale_x_continuous(breaks=seq(1,10,1), limits = c(1,10))
 ```
 
@@ -203,7 +205,7 @@ spark_run_local_big<-read.csv("output/spark_run_big.csv")
 knitr::kable(spark_run_local_big)
 ```
 
-Table 2 represents the total time taken and total average time of 10 runs of Scala job in seconds for the complete dataset. Each run takes about 100.6 seconds to finish. It is noticed that all the requirements but "top 5 hottest genres (mean artists hotness in artist_term)" finish in about 70 seconds, however the query mentioned involves a join and hence takes the majority of the time.
+Table 2 represents the total time taken and total average time of 10 runs of Scala job in seconds for the complete dataset. Each run takes about 306.8 seconds to finish. It is noticed that all the requirements but "top 5 hottest genres (mean artists hotness in artist_term)" finish in about 80 seconds, however the query mentioned involves a join and hence takes the majority of the time.
 
 ##### Plot 2: Total time in seconds vs Run for the big dataset
 
@@ -212,12 +214,12 @@ ggplot(spark_run_local_big, aes(x=Run, y=total_time, color="Total Time")) +
   geom_point() +
   ylab("Total Time in seconds") + 
   xlab("Run") + 
-  scale_y_continuous(breaks=seq(90,110,5), limits = c(90, 110)) +
+  scale_y_continuous(breaks=seq(304,310, 1), limits = c(304, 310)) +
   scale_x_continuous(breaks=seq(1,10,1), limits = c(1,10))
 ```
 
-Plot 2 represents the graph for the data shown in table 2. This represnts the total time taken by each run in seconds on the complete dataset. It can be seen from the graph that the values range between 98 to 102 seconds averaging out to 100.6 seconds for 10 runs.
+Plot 2 represents the graph for the data shown in table 2. This represnts the total time taken by each run in seconds on the complete dataset. It can be seen from the graph that the values range between 305 to 308 seconds averaging out to 306.8 seconds for 10 runs.
 
 ### Conclusion
 
-The program analysis some features of the Million song dataset. It was observed that if scala is picking up features from the same file, it runs fairly fast however while joining data points from 2 seperate files makes the program run very very slow. All the requirements but "top 5 hottest genres (mean artists hotness in artist_term)" finish in about 70 seconds but the the one mentioned takes about 14 minutes alone.
+The program analysis some features of the Million song dataset. It was observed that if scala is picking up features from the same file, it runs fairly fast however while joining data points from 2 seperate files makes the program run very very slow. All the requirements but "top 5 hottest genres (mean artists hotness in artist_term)" finish in about 70 seconds but the one mentioned takes about 236 seconds alone. Also, we cleaned up the data before doing any analysis, hence the number of records in each requirement appear to be less than it should have been. Instead we could have put individual cheacks on columns before we analysed them. That would have given greater counts.

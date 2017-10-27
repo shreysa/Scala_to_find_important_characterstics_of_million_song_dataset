@@ -26,6 +26,7 @@ object SongAnalysis {
   // entry point to the program
   def main(args: Array[String]) {
     val inputFileName = args(0)
+    val inputArtFileName = args(1)
   
 
     // Set-up logging
@@ -44,6 +45,10 @@ object SongAnalysis {
 
     // Start Processing
     val songFile = sc.textFile(inputFileName, 2)
+    val artistFile = sc.textFile(inputArtFileName, 2)
+    val headerAndRows = artistFile.map(line => line.split(";").map(_.trim))
+    val header = headerAndRows.first
+    val artistRecords = headerAndRows.filter(_(0) != header(0))
     var records = songFile.map(row => new CleanUp(row))
 
     // Clean-up
@@ -65,7 +70,7 @@ object SongAnalysis {
     getTopWords(records, sc)
 
     //Task: The 5 hottest genres
-    getTopGenre(records, sc)
+    getTopGenre(records, sc, artistRecords)
 
   }
 
@@ -133,12 +138,9 @@ object SongAnalysis {
   }
 
   // Logs the 5 hottest genres
-  def getTopGenre( records : rdd.RDD[CleanUp], sc : SparkContext): Unit ={
-    val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/CompleteDataset/artist_terms.csv")
-    val headerAndRows = lines.map(line => line.split(";").map(_.trim))
-    val header = headerAndRows.first
-    val data1 = headerAndRows.filter(_(0) != header(0))
-    val artist_term = data1.map(lines => (lines(0), lines(1))).distinct
+  def getTopGenre( records : rdd.RDD[CleanUp], sc : SparkContext, artistRecords : rdd.RDD[Array[String]]): Unit ={
+    
+    val artist_term = artistRecords.map(lines => (lines(0), lines(1))).distinct
     val artist_hotness = records.map(lines => (lines.getArtId(), lines.getArtHot()))
     var afterJoin = artist_term.join(artist_hotness)
     var afterGrouping = afterJoin.map(gr => (gr._2._1, gr._2._2)).groupBy(_._1)
