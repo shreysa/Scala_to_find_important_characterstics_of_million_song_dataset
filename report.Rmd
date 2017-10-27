@@ -69,7 +69,6 @@ SOBUICA12AB01810FC              | High Holidays                       |-0.073
 SOWAPWP12A58A76F49              | Burning Wire                        |-0.086
 SOLQHPP12AB0187EC7              | I Know What You Want                |-0.086
 
-The top 5 long songs are: List(((SOTRWAY12AB01890C0,Raga: Kaushi Kanada (Tabla: Kumar Bose)),3032.5024), ((SORUVZA12AB0188823,Mixshake),3007.73832), ((SOFKISV12A8C1425CD,El Camino Real),2999.50975), ((SOKXXXH12A6D4FA3D6,Passionately Loving God In A Lukewarm Church (Live from Passion07)),2997.10649), ((SONYUXE12A8C13FF28,The Garden Of Brokenness),2986.97098))
 #### Top 5 longest songs:
 (Assumption: the Song Id, Song Name and duration combination is unique)
 
@@ -156,21 +155,21 @@ ARLHO5Z1187FB4C861                  | Beastie Boys              | 194
 
 Key                        | Ocurrances                    
 -----------------------------------|------------------------------
-7                         | 30420       
-0                         | 28333          
-2                         | 25845     
-9                         | 21283
-4                         | 15214       
+7                         | 53144       
+9                         | 46855          
+2                         | 46431     
+4                         | 35099
+11                        | 35078       
 
 #### Top 5 most common words in song titles (excluding articles, prepositions, conjunctions):
 
 Word                        | Ocurrances                    
 -----------------------------------|------------------------------
-LOVE                        | 28666       
-LIVE                        | 17297          
-NO                          | 15461     
-YOUR                        | 14206
-DE                       | 13586 
+LOVE                        | 9882       
+LIVE                        | 6192          
+YOUR                        | 5333     
+NO                          | 4822
+REMIX                       | 4462 
 
 ### Performance Analysis
 
