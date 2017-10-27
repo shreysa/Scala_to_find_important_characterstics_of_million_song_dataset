@@ -27,7 +27,8 @@ object SongApp {
     val conf = new SparkConf().setAppName("Simple Application").setMaster("local")
     val sc = new SparkContext(conf)
 
-    val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/CompleteDataset/song_info.csv")
+    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/spark-2.2.0-bin-hadoop2.7/a6/a61/all/song_info.csv")
+    //val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/CompleteDataset/song_info.csv")
    // val lines = sc.textFile("/Users/shreysa/Academics/CS6240/A6/a6-jashangeet-shreysa/data/MillionSongSubset/song_info.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
@@ -111,8 +112,14 @@ object SongApp {
 
   def getTopWords( x : rdd.RDD[Array[String]]): Unit ={
     var x1 = checkValidity("10", x)
-    val top5Words = x1.map{_(24)}.flatMap { line => line.filter(c => c.isLetter || c.isWhitespace).toUpperCase.split(' ') }.filter { !_.isEmpty }.countByValue.toSeq.sortWith(_._2 > _._2).take(5)
-    //Taken from konrad's wordCount. Doesn't yet have the filter for articles etc.
+    val words = x1.map{_(24)}.flatMap { line => line.filter(c => c.isLetter || c.isWhitespace).toUpperCase.split(' ') }.filter { !_.isEmpty }
+    val ignored = Set(
+      "THAT", "WITH", "THE", "AND", "TO", "OF",
+      "A", "IT", "SHE", "HE", "YOU", "IN", "I",
+      "HER", "AT", "AS", "ON", "THIS", "FOR",
+      "BUT", "NOT", "OR", "ME", "MY", "LP", "VERSION", "IS", "ALBUM")
+    val top5words = sc.parallelize(words.filter { !ignored.contains(_) }.countByValue.toSeq).sortBy(_._2, false).take(5)
+
     //print
      val endTime = Calendar.getInstance().getTime().getMinutes - startTime
     println("Total Time taken: " + endTime)
@@ -121,16 +128,16 @@ object SongApp {
 
   /*incomplete, don't call*/
   def getTopGenre( x : rdd.RDD[Array[String]], sc : SparkContext): Unit ={
-    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/MillionSongSubset/artist_terms.csv")
+    val lines = sc.textFile("/Users/jashanrandhawa/Downloads/spark-2.2.0-bin-hadoop2.7/a6/a61/all/artist_terms.csv")
     val headerAndRows = lines.map(line => line.split(";").map(_.trim))
     val header = headerAndRows.first
     val data1 = headerAndRows.filter(_(0) != header(0))
 
-    val artist_term = data1.map(lines => (lines(1), lines(0)))
-    val artist_hotness = x.map(lines => ((lines(16), lines(17)), lines(20)))
+    val artist_term = data1.map(lines => (lines(0), lines(1))).reduceByKey((x,y) => x+"_"+y)
+    val artist_hotness = x.map(lines => (lines(16), lines(20)))
     //val artist_dist_hot = artist_hotness.distinct.map(lines => lines)
-    val art_coll = artist_hotness.distinct.map(lines => lines).collect
-    val top5Genres = artist_term.map(lines => (lines._1, art_coll.filter(_._1._1 == lines._2)(0)._2)).mapValues(x => (x.toDouble, 1)).reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2)).mapValues(y => 1.0 * y._1 / y._2).collect.toList.sortWith(_._2>_._2).take(5)
+    val art_coll = artist_hotness.distinct.collect
+    val top5Genres = artist_term.map(lines => (lines._1, art_coll.filter(_._1 == lines._2)(0)._2)).mapValues(x => (x.toDouble, 1)).reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2)).mapValues(y => 1.0 * y._1 / y._2).collect.toList.sortWith(_._2>_._2).take(5)
 
   }
 
